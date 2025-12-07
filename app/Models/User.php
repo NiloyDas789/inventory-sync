@@ -69,4 +69,12 @@ class User extends Authenticatable implements IShopModel
     {
         return $this->hasMany(SyncFieldMapping::class, 'shop_id');
     }
+
+    /**
+     * Get the sync logs for this shop
+     */
+    public function syncLogs()
+    {
+        return $this->hasMany(SyncLog::class, 'shop_id');
+    }
 }

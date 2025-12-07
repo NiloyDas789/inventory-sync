@@ -30,4 +30,14 @@ Route::middleware(['verify.shopify'])->group(function () {
         Route::get('/status', [\App\Http\Controllers\GoogleSheetsController::class, 'status'])->name('status');
         Route::post('/validate-structure', [\App\Http\Controllers\GoogleSheetsController::class, 'validateStructure'])->name('validate-structure');
     });
+
+    // Sync routes
+    Route::prefix('sync')->name('sync.')->group(function () {
+        Route::post('/products', [\App\Http\Controllers\SyncController::class, 'syncProducts'])->name('products');
+        Route::post('/inventory', [\App\Http\Controllers\SyncController::class, 'syncInventory'])->name('inventory');
+        Route::post('/from-sheets', [\App\Http\Controllers\SyncController::class, 'syncFromSheets'])->name('from-sheets');
+        Route::post('/full', [\App\Http\Controllers\SyncController::class, 'fullSync'])->name('full');
+        Route::get('/status', [\App\Http\Controllers\SyncController::class, 'status'])->name('status');
+        Route::get('/logs/{id}', [\App\Http\Controllers\SyncController::class, 'getSyncLog'])->name('logs.show');
+    });
 });
