@@ -20,9 +20,14 @@ use Inertia\Inertia;
 |
 */
 
-// Example: API routes for React frontend communication
+// Google Sheets routes
 Route::middleware(['verify.shopify'])->group(function () {
-    // Add your custom API routes here for authenticated shops
-    // Example:
-    // Route::get('/api/sync-status', [SyncController::class, 'status']);
+    Route::prefix('google-sheets')->name('google-sheets.')->group(function () {
+        Route::get('/connect', [\App\Http\Controllers\GoogleSheetsController::class, 'connect'])->name('connect');
+        Route::get('/callback', [\App\Http\Controllers\GoogleSheetsController::class, 'callback'])->name('callback');
+        Route::post('/disconnect', [\App\Http\Controllers\GoogleSheetsController::class, 'disconnect'])->name('disconnect');
+        Route::post('/test', [\App\Http\Controllers\GoogleSheetsController::class, 'test'])->name('test');
+        Route::get('/status', [\App\Http\Controllers\GoogleSheetsController::class, 'status'])->name('status');
+        Route::post('/validate-structure', [\App\Http\Controllers\GoogleSheetsController::class, 'validateStructure'])->name('validate-structure');
+    });
 });

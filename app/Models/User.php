@@ -53,4 +53,20 @@ class User extends Authenticatable implements IShopModel
             'deleted_at' => 'datetime',
         ];
     }
+
+    /**
+     * Get the Google Sheets connection for this shop
+     */
+    public function googleSheetsConnection()
+    {
+        return $this->hasOne(GoogleSheetsConnection::class, 'shop_id');
+    }
+
+    /**
+     * Get the sync field mappings for this shop
+     */
+    public function syncFieldMappings()
+    {
+        return $this->hasMany(SyncFieldMapping::class, 'shop_id');
+    }
 }
