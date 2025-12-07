@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AddShopifySecurityHeaders;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -16,6 +17,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
+            AddShopifySecurityHeaders::class,
+        ]);
+
+        // Disable CSRF verification for webhook routes
+        $middleware->validateCsrfTokens(except: [
+            '*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

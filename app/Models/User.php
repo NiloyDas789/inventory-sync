@@ -6,11 +6,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Osiset\ShopifyApp\Contracts\ShopModel as IShopModel;
+use Osiset\ShopifyApp\Traits\ShopModel as ShopModelTrait;
 
-class User extends Authenticatable
+class User extends Authenticatable implements IShopModel
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, ShopModelTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +23,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'shopify_grandfathered',
+        'shopify_namespace',
+        'shopify_freemium',
     ];
 
     /**
@@ -43,6 +48,9 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'shopify_grandfathered' => 'boolean',
+            'shopify_freemium' => 'boolean',
+            'deleted_at' => 'datetime',
         ];
     }
 }
