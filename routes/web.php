@@ -42,5 +42,7 @@ Route::middleware(['verify.shopify'])->group(function () {
         Route::get('/progress/{id}', [\App\Http\Controllers\SyncController::class, 'getProgress'])->name('progress');
         Route::get('/logs/{id}', [\App\Http\Controllers\SyncController::class, 'getSyncLog'])->name('logs.show');
         Route::get('/preview/{id}', [\App\Http\Controllers\SyncController::class, 'getImportPreview'])->name('preview');
+        Route::get('/field-mappings', [\App\Http\Controllers\SyncController::class, 'getFieldMappings'])->name('field-mappings');
+        Route::post('/field-mappings', [\App\Http\Controllers\SyncController::class, 'saveFieldMappings'])->name('field-mappings.save');
     });
 });

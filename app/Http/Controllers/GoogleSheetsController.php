@@ -24,11 +24,14 @@ class GoogleSheetsController extends Controller
     /**
      * Initiate OAuth flow - redirect to Google
      */
-    public function connect(Request $request): RedirectResponse
+    public function connect(Request $request): JsonResponse|RedirectResponse
     {
         $shop = $request->user();
         
         if (!$shop instanceof User) {
+            if ($request->expectsJson()) {
+                return response()->json(['error' => 'Shop not authenticated'], 401);
+            }
             return redirect()->back()->with('error', 'Shop not authenticated');
         }
 
@@ -40,12 +43,27 @@ class GoogleSheetsController extends Controller
 
             $authUrl = $this->sheetsService->getAuthUrl($state);
             
+            // If API request, return JSON with redirect URL
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'redirect_url' => $authUrl,
+                ]);
+            }
+            
             return redirect($authUrl);
         } catch (Exception $e) {
             Log::error('Error initiating Google OAuth', [
                 'shop_id' => $shop->id,
                 'error' => $e->getMessage(),
             ]);
+            
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Failed to initiate Google authentication: ' . $e->getMessage(),
+                ], 500);
+            }
             
             return redirect()->back()->with('error', 'Failed to initiate Google authentication');
         }
@@ -135,21 +153,26 @@ class GoogleSheetsController extends Controller
             return response()->json(['error' => 'Shop not authenticated'], 401);
         }
 
-        $validator = Validator::make($request->all(), [
-            'sheet_id' => 'required|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'error' => 'Validation failed',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
         try {
             $this->sheetsService->setConnection($shop);
             
-            $sheetId = $request->get('sheet_id');
+            // Get sheet_id from request or use connection's sheet_id
+            $connection = GoogleSheetsConnection::where('shop_id', $shop->id)->first();
+            if (!$connection || !$connection->hasValidTokens()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No active Google Sheets connection',
+                ], 400);
+            }
+
+            $sheetId = $request->get('sheet_id', $connection->sheet_id);
+            
+            if (!$sheetId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No sheet ID provided',
+                ], 400);
+            }
             
             // Validate access
             $hasAccess = $this->sheetsService->validateSheetAccess($sheetId);
@@ -164,9 +187,8 @@ class GoogleSheetsController extends Controller
             // Get spreadsheet info
             $info = $this->sheetsService->getSpreadsheetInfo($sheetId);
             
-            // Update connection with sheet info
-            $connection = GoogleSheetsConnection::where('shop_id', $shop->id)->first();
-            if ($connection) {
+            // Update connection with sheet info if different
+            if ($connection->sheet_id !== $sheetId) {
                 $connection->update([
                     'sheet_id' => $sheetId,
                     'sheet_url' => "https://docs.google.com/spreadsheets/d/{$sheetId}",
@@ -177,9 +199,9 @@ class GoogleSheetsController extends Controller
                 'success' => true,
                 'message' => 'Connection test successful',
                 'data' => [
-                    'spreadsheet_id' => $info['id'],
-                    'title' => $info['title'],
-                    'sheets' => $info['sheets'],
+                    'spreadsheet_id' => $info['id'] ?? $sheetId,
+                    'title' => $info['title'] ?? 'Unknown',
+                    'sheets' => $info['sheets'] ?? [],
                 ],
             ]);
         } catch (Exception $e) {
@@ -212,6 +234,8 @@ class GoogleSheetsController extends Controller
             
             if (!$connection || !$connection->hasValidTokens()) {
                 return response()->json([
+                    'success' => true,
+                    'data' => null,
                     'connected' => false,
                     'message' => 'No active Google Sheets connection',
                 ]);
@@ -231,10 +255,17 @@ class GoogleSheetsController extends Controller
             }
 
             return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $connection->id,
+                    'shop_id' => $connection->shop_id,
+                    'sheet_id' => $connection->sheet_id,
+                    'sheet_url' => $connection->sheet_url,
+                    'last_synced_at' => $connection->last_synced_at?->toIso8601String(),
+                    'created_at' => $connection->created_at->toIso8601String(),
+                    'updated_at' => $connection->updated_at->toIso8601String(),
+                ],
                 'connected' => true,
-                'sheet_id' => $connection->sheet_id,
-                'sheet_url' => $connection->sheet_url,
-                'last_synced_at' => $connection->last_synced_at?->toIso8601String(),
                 'spreadsheet_info' => $info,
             ]);
         } catch (Exception $e) {
@@ -244,6 +275,7 @@ class GoogleSheetsController extends Controller
             ]);
 
             return response()->json([
+                'success' => false,
                 'error' => 'Failed to get connection status',
             ], 500);
         }
