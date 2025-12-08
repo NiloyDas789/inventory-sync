@@ -300,9 +300,55 @@ class InventoryService
     }
 
     /**
+     * Fetch products updated since a specific date (for incremental sync)
+     */
+    public function fetchProductsSince(\DateTimeInterface $since, ?string $cursor = null, int $limit = 250): array
+    {
+        $query = <<<'GRAPHQL'
+            query getProductsSince($first: Int!, $after: String, $updatedAt: DateTime!) {
+                products(first: $first, after: $after, query: $updatedAt) {
+                    pageInfo {
+                        hasNextPage
+                        endCursor
+                    }
+                    edges {
+                        node {
+                            id
+                            title
+                            handle
+                            updatedAt
+                            variants(first: 250) {
+                                edges {
+                                    node {
+                                        id
+                                        sku
+                                        inventoryQuantity
+                                        updatedAt
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        GRAPHQL;
+
+        $variables = [
+            'first' => $limit,
+            'updatedAt' => "updated_at:>={$since->format('Y-m-d\TH:i:s\Z')}",
+        ];
+
+        if ($cursor) {
+            $variables['after'] = $cursor;
+        }
+
+        return $this->executeGraphQLQuery($query, $variables);
+    }
+
+    /**
      * Execute GraphQL query with retry logic
      */
-    protected function executeGraphQLQuery(string $query, array $variables = []): array
+    public function executeGraphQLQuery(string $query, array $variables = []): array
     {
         $attempt = 0;
         $lastException = null;

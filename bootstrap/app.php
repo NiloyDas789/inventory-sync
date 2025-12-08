@@ -27,4 +27,11 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    })->create();
+    })
+    ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule): void {
+        // Schedule daily exports at 2 AM
+        $schedule->command('sync:export-scheduled --strategy=incremental')
+            ->dailyAt('02:00')
+            ->timezone('UTC');
+    })
+    ->create();

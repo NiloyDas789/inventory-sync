@@ -37,7 +37,10 @@ Route::middleware(['verify.shopify'])->group(function () {
         Route::post('/inventory', [\App\Http\Controllers\SyncController::class, 'syncInventory'])->name('inventory');
         Route::post('/from-sheets', [\App\Http\Controllers\SyncController::class, 'syncFromSheets'])->name('from-sheets');
         Route::post('/full', [\App\Http\Controllers\SyncController::class, 'fullSync'])->name('full');
+        Route::post('/start', [\App\Http\Controllers\SyncController::class, 'startSync'])->name('start');
         Route::get('/status', [\App\Http\Controllers\SyncController::class, 'status'])->name('status');
+        Route::get('/progress/{id}', [\App\Http\Controllers\SyncController::class, 'getProgress'])->name('progress');
         Route::get('/logs/{id}', [\App\Http\Controllers\SyncController::class, 'getSyncLog'])->name('logs.show');
+        Route::get('/preview/{id}', [\App\Http\Controllers\SyncController::class, 'getImportPreview'])->name('preview');
     });
 });

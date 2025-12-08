@@ -385,22 +385,12 @@ return [
     */
 
     'webhooks' => [
-        /*
-            [
-                'topic' => env('SHOPIFY_WEBHOOK_1_TOPIC', 'ORDERS_CREATE'),
-                'address' => env('SHOPIFY_WEBHOOK_1_ADDRESS', 'https://example.com/webhook/orders-create')
-            ], [
-                'topic' => env('SHOPIFY_WEBHOOK_2_TOPIC', 'APP_PURCHASES_ONE_TIME_UPDATE'),
-                'address' => env('SHOPIFY_WEBHOOK_2_ADDRESS', 'https://example.com/webhook/purchase'),
-            ]
-            // In certain situations you may wish to map the webhook to a specific class
-            // To do this, change the array to an associative array with a 'class' key
-            'orders-create' => [
-                'topic' => env('SHOPIFY_WEBHOOK_3_TOPIC', 'ORDERS_PAID'),
-                'address' => env('SHOPIFY_WEBHOOK_3_ADDRESS', 'https://example.com/webhook/orders-create'),
-                'class' => \App\Shopify\Actions\ExampleAppJob::class
-            ],
-        */],
+        [
+            'topic' => env('SHOPIFY_WEBHOOK_INVENTORY_LEVELS_UPDATE_TOPIC', 'INVENTORY_LEVELS_UPDATE'),
+            'address' => env('SHOPIFY_WEBHOOK_INVENTORY_LEVELS_UPDATE_ADDRESS', env('APP_URL') . '/webhook/inventory-levels-update'),
+            'class' => \App\Jobs\InventoryLevelsUpdateJob::class,
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------
