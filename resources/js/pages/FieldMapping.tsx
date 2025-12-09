@@ -5,8 +5,6 @@ import {
     Layout,
     FormLayout,
     Checkbox,
-    TextField,
-    Button,
     BlockStack,
     InlineStack,
     Text,
@@ -16,6 +14,7 @@ import {
     EmptyState,
 } from '@shopify/polaris';
 import { Head } from '@inertiajs/react';
+import { AppLayout } from '../layouts/AppLayout';
 import api from '../lib/axios';
 import type { SyncFieldMapping } from '../types';
 
@@ -38,6 +37,12 @@ const AVAILABLE_FIELDS = [
 
 const COLUMN_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
+/**
+ * Field Mapping Page Component
+ *
+ * Configures field mappings between Shopify and Google Sheets.
+ * Wrapped in AppLayout to provide Polaris context and navigation.
+ */
 export default function FieldMappingPage() {
     const [loading, setLoading] = useState(true);
     const [mappings, setMappings] = useState<SyncFieldMapping[]>([]);
@@ -116,22 +121,24 @@ export default function FieldMappingPage() {
 
     if (loading) {
         return (
-            <Page title="Field Mapping">
-                <Layout>
-                    <Layout.Section>
-                        <Card>
-                            <InlineStack align="center">
-                                <Spinner size="large" />
-                            </InlineStack>
-                        </Card>
-                    </Layout.Section>
-                </Layout>
-            </Page>
+            <AppLayout>
+                <Page title="Field Mapping">
+                    <Layout>
+                        <Layout.Section>
+                            <Card>
+                                <InlineStack align="center">
+                                    <Spinner size="large" />
+                                </InlineStack>
+                            </Card>
+                        </Layout.Section>
+                    </Layout>
+                </Page>
+            </AppLayout>
         );
     }
 
     return (
-        <>
+        <AppLayout>
             <Head title="Field Mapping" />
             <Page
                 title="Field Mapping Configuration"
@@ -216,7 +223,7 @@ export default function FieldMappingPage() {
                     </Layout.Section>
                 </Layout>
             </Page>
-        </>
+        </AppLayout>
     );
 }
 

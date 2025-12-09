@@ -14,9 +14,20 @@ import {
     EmptyState,
 } from '@shopify/polaris';
 import { Head } from '@inertiajs/react';
+import { AppLayout } from '../layouts/AppLayout';
 import api from '../lib/axios';
 import type { GoogleSheetsConnection, SyncLog } from '../types';
 
+/**
+ * Dashboard Page Component
+ * 
+ * Main dashboard showing:
+ * - Google Sheets connection status
+ * - Sync history
+ * - Quick action buttons
+ * 
+ * Wrapped in AppLayout to provide Polaris context and navigation.
+ */
 export default function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [connection, setConnection] = useState<GoogleSheetsConnection | null>(null);
@@ -100,22 +111,24 @@ export default function Dashboard() {
 
     if (loading) {
         return (
-            <Page title="Dashboard">
-                <Layout>
-                    <Layout.Section>
-                        <Card>
-                            <InlineStack align="center">
-                                <Spinner size="large" />
-                            </InlineStack>
-                        </Card>
-                    </Layout.Section>
-                </Layout>
-            </Page>
+            <AppLayout>
+                <Page title="Dashboard">
+                    <Layout>
+                        <Layout.Section>
+                            <Card>
+                                <InlineStack align="center">
+                                    <Spinner size="large" />
+                                </InlineStack>
+                            </Card>
+                        </Layout.Section>
+                    </Layout>
+                </Page>
+            </AppLayout>
         );
     }
 
     return (
-        <>
+        <AppLayout>
             <Head title="Dashboard" />
             <Page
                 title="Inventory Sync Dashboard"
@@ -223,7 +236,7 @@ export default function Dashboard() {
                     </Layout.Section>
                 </Layout>
             </Page>
-        </>
+        </AppLayout>
     );
 }
 

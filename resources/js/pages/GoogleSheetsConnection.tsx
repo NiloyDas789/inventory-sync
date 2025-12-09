@@ -14,9 +14,16 @@ import {
     EmptyState,
 } from '@shopify/polaris';
 import { Head } from '@inertiajs/react';
+import { AppLayout } from '../layouts/AppLayout';
 import api from '../lib/axios';
 import type { GoogleSheetsConnection } from '../types';
 
+/**
+ * Google Sheets Connection Page Component
+ * 
+ * Manages Google Sheets OAuth connection and displays connection status.
+ * Wrapped in AppLayout to provide Polaris context and navigation.
+ */
 export default function GoogleSheetsConnectionPage() {
     const [loading, setLoading] = useState(true);
     const [connection, setConnection] = useState<GoogleSheetsConnection | null>(null);
@@ -82,22 +89,24 @@ export default function GoogleSheetsConnectionPage() {
 
     if (loading) {
         return (
-            <Page title="Google Sheets Connection">
-                <Layout>
-                    <Layout.Section>
-                        <Card>
-                            <InlineStack align="center">
-                                <Spinner size="large" />
-                            </InlineStack>
-                        </Card>
-                    </Layout.Section>
-                </Layout>
-            </Page>
+            <AppLayout>
+                <Page title="Google Sheets Connection">
+                    <Layout>
+                        <Layout.Section>
+                            <Card>
+                                <InlineStack align="center">
+                                    <Spinner size="large" />
+                                </InlineStack>
+                            </Card>
+                        </Layout.Section>
+                    </Layout>
+                </Page>
+            </AppLayout>
         );
     }
 
     return (
-        <>
+        <AppLayout>
             <Head title="Google Sheets Connection" />
             <Page
                 title="Google Sheets Connection"
@@ -252,7 +261,7 @@ export default function GoogleSheetsConnectionPage() {
                     </Modal.Section>
                 </Modal>
             </Page>
-        </>
+        </AppLayout>
     );
 }
 

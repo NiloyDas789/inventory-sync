@@ -17,9 +17,16 @@ import {
     Checkbox,
 } from '@shopify/polaris';
 import { Head } from '@inertiajs/react';
+import { AppLayout } from '../layouts/AppLayout';
 import api from '../lib/axios';
 import type { SyncStartRequest, SyncProgress, SyncLog } from '../types';
 
+/**
+ * Sync Management Page Component
+ * 
+ * Manages synchronization operations between Shopify and Google Sheets.
+ * Wrapped in AppLayout to provide Polaris context and navigation.
+ */
 export default function SyncManagementPage() {
     const [loading, setLoading] = useState(false);
     const [syncType, setSyncType] = useState<'full' | 'incremental' | 'selective'>('full');
@@ -80,7 +87,7 @@ export default function SyncManagementPage() {
     };
 
     return (
-        <>
+        <AppLayout>
             <Head title="Sync Management" />
             <Page
                 title="Sync Management"
@@ -225,7 +232,7 @@ export default function SyncManagementPage() {
                     </Layout.Section>
                 </Layout>
             </Page>
-        </>
+        </AppLayout>
     );
 }
 
