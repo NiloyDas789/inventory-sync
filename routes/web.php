@@ -20,7 +20,22 @@ use Inertia\Inertia;
 |
 */
 
-// Google Sheets routes
+// Main application routes with Inertia
+Route::middleware(['verify.shopify'])->group(function () {
+    Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('/dashboard', [\App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
+    Route::get('/google-sheets', function () {
+        return Inertia::render('GoogleSheetsConnection');
+    })->name('google-sheets');
+    Route::get('/field-mapping', function () {
+        return Inertia::render('FieldMapping');
+    })->name('field-mapping');
+    Route::get('/sync-management', function () {
+        return Inertia::render('SyncManagement');
+    })->name('sync-management');
+});
+
+// Google Sheets API routes
 Route::middleware(['verify.shopify'])->group(function () {
     Route::prefix('google-sheets')->name('google-sheets.')->group(function () {
         Route::get('/connect', [\App\Http\Controllers\GoogleSheetsController::class, 'connect'])->name('connect');
